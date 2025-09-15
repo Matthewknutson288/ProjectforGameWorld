@@ -74,12 +74,22 @@ class TimesheetApp {
             return;
         }
         try {
-            // Public CSV URL from published sheet
-            const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
-            const res = await fetch(url, { cache: 'no-store' });
-            if (!res.ok) throw new Error('Failed to fetch sheet');
-            const csv = await res.text();
-            const rows = this.parseCsv(csv);
+            // Use OpenSheet (public CORS-friendly JSON) first to avoid CORS blocks
+            // Docs: https://opensheet.elk.sh
+            const urlJson = `https://opensheet.elk.sh/${id}/${encodeURIComponent(name)}`;
+            let rows;
+            try {
+                const resJson = await fetch(urlJson, { cache: 'no-store' });
+                if (!resJson.ok) throw new Error('OpenSheet fetch failed');
+                rows = await resJson.json();
+            } catch (e) {
+                // Fallback to published CSV if OpenSheet not available
+                const urlCsv = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
+                const resCsv = await fetch(urlCsv, { cache: 'no-store' });
+                if (!resCsv.ok) throw new Error('Failed to fetch sheet');
+                const csv = await resCsv.text();
+                rows = this.parseCsv(csv);
+            }
             this.ingestRows(rows);
             this.saveToStorage();
             this.displayAllEmployees();
