@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Timesheet System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="login-container">
+                <div class="login-header">
+                    <i class="fas fa-clock"></i>
+                    <h1>Employee Timesheet System</h1>
+                    <p>Please log in to view your schedule</p>
+                </div>
+                <form id="loginForm" class="login-form" action="javascript:void(0)">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select id="role" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="employee">Employee</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </button>
+                </form>
+                <div id="loginError" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- Employee Dashboard -->
+        <div id="employeeScreen" class="screen">
+            <header class="header">
+                <div class="header-content">
+                    <h1><i class="fas fa-user-clock"></i> Employee Dashboard</h1>
+                    <div class="user-info">
+                        <span id="employeeName"></span>
+                        <button id="logoutBtn" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <main class="main-content">
+                <div class="dashboard-container">
+                    <div class="tab-navigation">
+                        <button class="tab-btn active" data-tab="timesheet">
+                            <i class="fas fa-clock"></i>
+                            Timesheet
+                        </button>
+                        <button class="tab-btn" data-tab="schedule">
+                            <i class="fas fa-calendar-alt"></i>
+                            Schedule
+                        </button>
+                    </div>
+                    
+                    <!-- Timesheet Tab -->
+                    <div id="timesheetTab" class="tab-content active">
+                        <div class="timesheet-container">
+                            <div class="timesheet-header">
+                                <h2>Your Timesheet</h2>
+                                <div class="schedule-info">
+                                    <span id="currentWeek"></span>
+                                </div>
+                            </div>
+                            <div id="timesheetContent" class="timesheet-content">
+                                <!-- Timesheet will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Schedule Tab -->
+                    <div id="scheduleTab" class="tab-content">
+                        <div class="schedule-container">
+                            <div class="schedule-header">
+                                <h2>Your Schedule</h2>
+                                <div class="schedule-info">
+                                    <span id="currentWeekSchedule"></span>
+                                </div>
+                            </div>
+                            <div id="scheduleContent" class="schedule-content">
+                                <!-- Schedule will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminScreen" class="screen">
+            <header class="header">
+                <div class="header-content">
+                    <h1><i class="fas fa-tools"></i> Admin Dashboard</h1>
+                    <div class="user-info">
+                        <span>Admin</span>
+                        <button id="adminLogoutBtn" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <main class="main-content">
+                <div class="dashboard-container">
+                    <div class="tab-navigation">
+                        <button class="tab-btn active" data-tab="upload">
+                            <i class="fas fa-upload"></i>
+                            Upload Schedule
+                        </button>
+                        <button class="tab-btn" data-tab="employees">
+                            <i class="fas fa-users"></i>
+                            Employee Schedules
+                        </button>
+                    </div>
+                    
+                    <!-- Upload/Sync Tab -->
+                    <div id="uploadTab" class="tab-content active">
+                        <div class="upload-section">
+                            <h2>Google Sheets Settings</h2>
+                            <div class="shift-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="sheetIdInput">Sheet ID</label>
+                                        <input type="text" id="sheetIdInput" placeholder="1A2B3C...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sheetNameInput">Worksheet Name</label>
+                                        <input type="text" id="sheetNameInput" placeholder="Schedule">
+                                    </div>
+                                </div>
+                                <div class="upload-actions">
+                                    <button id="saveSheetConfigBtn" class="template-btn">
+                                        <i class="fas fa-save"></i>
+                                        Save Settings
+                                    </button>
+                                    <button id="syncFromSheetBtn" class="upload-btn">
+                                        <i class="fas fa-sync"></i>
+                                        Sync from Google Sheets
+                                    </button>
+                                    <button id="downloadTemplateBtn" class="template-btn">
+                                        <i class="fas fa-download"></i>
+                                        Download Template
+                                    </button>
+                                </div>
+                                <p class="upload-hint" style="margin-top:10px;">Instructions: In Google Sheets → File → Share → Publish to web → Select your worksheet and publish. Paste the Sheet ID here (between /d/ and /edit in the URL) and the worksheet name.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Employees Tab -->
+                    <div id="employeesTab" class="tab-content">
+                        <div class="employees-section">
+                            <h2>Employee Schedules</h2>
+                            <div id="employeesList" class="employees-list">
+                                <!-- Employee list will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Employee Detail Modal -->
+        <div id="employeeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalEmployeeName">Employee Schedule</h2>
+                    <button id="closeModal" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="add-shift-section">
+                        <h3>Add New Shift</h3>
+                        <div class="shift-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="shiftDay">Day</label>
+                                    <select id="shiftDay">
+                                        <option value="Monday">Monday</option>
+                                        <option value="Tuesday">Tuesday</option>
+                                        <option value="Wednesday">Wednesday</option>
+                                        <option value="Thursday">Thursday</option>
+                                        <option value="Friday">Friday</option>
+                                        <option value="Saturday">Saturday</option>
+                                        <option value="Sunday">Sunday</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shiftSite">Site</label>
+                                    <input type="text" id="shiftSite" placeholder="e.g., Site 1">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="shiftStartTime">Start Time</label>
+                                    <input type="text" id="shiftStartTime" placeholder="e.g., 9:00 AM">
+                                </div>
+                                <div class="form-group">
+                                    <label for="shiftEndTime">End Time</label>
+                                    <input type="text" id="shiftEndTime" placeholder="e.g., 5:00 PM">
+                                </div>
+                            </div>
+                            <button id="addShiftBtn" class="add-shift-btn">
+                                <i class="fas fa-plus"></i>
+                                Add Shift
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="current-shifts-section">
+                        <h3>Current Shifts</h3>
+                        <div id="shiftsList" class="shifts-list">
+                            <!-- Shifts will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
